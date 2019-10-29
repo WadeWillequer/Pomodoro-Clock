@@ -41,7 +41,10 @@ function Clock() {
         mode = "Session", //Keeps track of what mode we're in- session or break
         active = false, //Keeps track of whether the clock is running or not
         _this = this, //reference to the Clock itself
-        timer; //Reference to the interval that we upo to make the timer run
+        timer, //Reference to the interval that we upo to make the timer run
+        startAudio = new Audio("../assets/start.mp3"),
+        endAudio = new Audio("../assets/end.mp3");
+
 
 
 
@@ -86,6 +89,13 @@ function Clock() {
         } else if (mode === "Break" && $('.progress-radial').hasClass('session')) {
 
         }
+
+               //Set up the step class for the radial
+               $('.progress-radial').attr('class', function(index, currentValue) {
+                return currentValue.replace(/(^|\s)step-\S+/g , " step-" + (100 - parseInt((currentTime / startTime) * 100)));
+            });
+    
+            console.log($('.progress-radial').attr('class'));
     }
 
     //function to display the session time
@@ -110,14 +120,6 @@ function Clock() {
             //If we're in a break, we should show the text break
             $('.session-count').html("<h2>Break!</h2>");
         }
-
-        //Set up the step class for the radial
-        $('.progress-radial').attr('class', function(index, currentValue) {
-            return currentValue.replace(/(^|\s)step-\S+/g , " step-" + (100 - parseInt((currentTime / startTime) * 100)));
-        });
-
-        console.log($('.progress-radial').attr('class'));
-
 
     }
 
@@ -163,6 +165,7 @@ function Clock() {
             if (sessionCount === 0) {
                 sessionCount = 1;
                 this.displaySessionCount();
+                startAudio.play();
             }
             $(".time-start").text("Pause");
             timer = setInterval(function () {
@@ -186,12 +189,14 @@ function Clock() {
                     currentTime = breakTime;
                     startTime = breakTime;
                     this.displaySessionCount();
+                    endAudio.play()
                 } else {
                     mode = "Session";
                     currentTime = sessionTime;
                     startTime = sessionTime;
                     sessionCount++
                     this.displaySessionCount();
+                    startAudio.play()
                 }
             }
         }
